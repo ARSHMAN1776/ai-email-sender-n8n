@@ -1,0 +1,411 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1940,
+        -140
+      ],
+      "id": "6b2ab2e2-c683-4f6e-8e8b-dc288795bc58",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a professional outreach email to a client named {{ $('Get Leads').item.json.Name }}. No subject line. Keep it very short, clear, and ready for sending. No placeholders like [Your Name] or [Company]. Start with a direct hook. Use spaced lines or bullets. Say we automate lead generation, email sequences, CRM updates, and data entry. Say it saves 15+ hours/week. Invite them to reply or schedule a 15-minute call.not ask for any link Here End with “Thanks!” only. Keep it under 150 words.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -700,
+        -180
+      ],
+      "id": "2c41aba9-8766-4577-8844-68a16e8d7a93",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        340
+      ],
+      "id": "c7fe2105-4a09-44cd-8335-cd2261cdc983",
+      "name": "Wait",
+      "webhookId": "5ae09415-95ca-4625-915a-455fba1d0fa2"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-r1:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -740,
+        180
+      ],
+      "id": "2986f3b7-e7ff-4dd8-9815-4cc7f961ef0d",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "DrP7lOhA3nQouvtz",
+          "name": "OpenRouter account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1FH4pNoKCTWZVTVD1KPH0xAT1PtnbLGDBi71OaqyN5y4",
+          "mode": "list",
+          "cachedResultName": "n8n automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FH4pNoKCTWZVTVD1KPH0xAT1PtnbLGDBi71OaqyN5y4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FH4pNoKCTWZVTVD1KPH0xAT1PtnbLGDBi71OaqyN5y4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "c8f502fa-6575-4ad7-96d2-c54a813a2585",
+      "name": "Get Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        -1600,
+        -400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ie40A4EwuTZJry9l",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "09977f76-325b-48b9-a8dc-b90bbf195c4d",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "2b9e281c-5a38-4d25-8c90-1b3acb062447",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1240,
+        -420
+      ],
+      "id": "32005df6-47c2-4440-84b6-34808d78ca7e",
+      "name": "Check Status"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get Leads').item.json.Email }}",
+        "subject": "test",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -280,
+        -20
+      ],
+      "id": "6bda1686-4d59-4d43-875f-60582f0126d3",
+      "name": "Send Leads",
+      "webhookId": "52585ed8-7ad5-4aef-a442-5731f4887c1b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LnvPJE4C2oR3x4GT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1220,
+        300
+      ],
+      "id": "f660bfc7-361e-45b1-bc34-bd5fa462b940",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "mergeByIndex",
+        "join": "inner"
+      },
+      "id": "4dc18d97-7860-4dab-b303-b1ef9454e6ca",
+      "name": "Merge Gmail + Sheet Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1FH4pNoKCTWZVTVD1KPH0xAT1PtnbLGDBi71OaqyN5y4",
+          "mode": "list",
+          "cachedResultName": "n8n automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FH4pNoKCTWZVTVD1KPH0xAT1PtnbLGDBi71OaqyN5y4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FH4pNoKCTWZVTVD1KPH0xAT1PtnbLGDBi71OaqyN5y4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Sent",
+            "Email": "={{ $json.Email }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        40,
+        -160
+      ],
+      "id": "10586d45-c3b5-4ecc-b3b6-07a43582fee8",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ie40A4EwuTZJry9l",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Leads": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Gmail + Sheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Send Leads": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Gmail + Sheet Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Gmail + Sheet Data": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "f253b5dd-9d20-4a82-a208-96e56ba48d46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61f80f201e808af1ac9e03f2b30106bf66ddbad73910b147e6733cdd2a275767"
+  },
+  "id": "xD8VwrVGaYaMLdY5",
+  "tags": []
+}
